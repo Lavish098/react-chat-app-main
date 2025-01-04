@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://react-chat-app-main-nine.vercel.app", // React app URL
+    origin: "*", // React app URL
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -23,7 +23,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://react-chat-app-main-nine.vercel.app",
+    origin: "*",
     credentials: true,
   })
 );
