@@ -4,7 +4,7 @@ import { data, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://react-chat-app-main-lbcd.vercel.app");
 
 export const ChatContext = createContext();
 
@@ -43,7 +43,7 @@ const ChatContextProvider = (props) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5000/search?username=${searchUsername}`
+        `https://react-chat-app-main-lbcd.vercel.app/search?username=${searchUsername}`
       );
       const data = await response.json();
       if (data) {
@@ -76,7 +76,7 @@ const ChatContextProvider = (props) => {
     const user = localStorage.getItem("chatUser");
 
     const response = await fetch(
-      `http://localhost:5000/message/${username}?user=${user}`
+      `https://react-chat-app-main-lbcd.vercel.app/message/${username}?user=${user}`
     );
     const data = await response.json();
     setMessages(data);
@@ -94,11 +94,14 @@ const ChatContextProvider = (props) => {
           message: message,
         };
 
-        await fetch("http://localhost:5000/send-message", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(chatMessage),
-        });
+        await fetch(
+          "https://react-chat-app-main-lbcd.vercel.app/send-message",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(chatMessage),
+          }
+        );
 
         setMessage(""); // Clear the message input
         socket.emit("message", chatMessage);
@@ -121,13 +124,16 @@ const ChatContextProvider = (props) => {
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    const response = await fetch(
+      "https://react-chat-app-main-lbcd.vercel.app/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
 
     if (response.status === 400) {
       const data = await response.json();
@@ -147,13 +153,16 @@ const ChatContextProvider = (props) => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/signin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    const response = await fetch(
+      "https://react-chat-app-main-lbcd.vercel.app/signin",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
+    );
 
     if (response.status === 400) {
       const data = await response.json();
