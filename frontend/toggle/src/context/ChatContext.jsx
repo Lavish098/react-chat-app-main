@@ -23,25 +23,19 @@ const ChatContextProvider = (props) => {
   const [chatUser, setChatUser] = useState(null);
 
   useEffect(() => {
-    socket.on("receiveMessage", (newMessage) => {
-      if (
-        newMessage.sender === selectedUser?.username ||
-        newMessage.receiver === selectedUser?.username
-      ) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
+    socket.on("message", (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
     return () => {
       socket.off("receiveMessage");
     };
-  }, [selectedUser]);
+  }, []);
 
   useEffect(() => {
     const searchedUser = localStorage.getItem("searchedUser");
     if (searchedUser) {
       setUsernames(JSON.parse(searchedUser));
     }
-    console.log(usernames);
   }, []);
 
   // search user
@@ -67,11 +61,8 @@ const ChatContextProvider = (props) => {
 
       setChatUser(data[0].username); // Set the chat user to the found user
       setSearchUsername(""); // Clear the search input
-      // setMessages([]); // Clear previous messages
       fetchMessages(data[0].username); // Fetch messages for the found user
     } catch (error) {
-      console.log(error);
-
       toast.error("User does not exist");
     }
   };
@@ -82,9 +73,11 @@ const ChatContextProvider = (props) => {
   };
 
   const fetchMessages = async (username) => {
-    console.log(username);
+    const user = localStorage.getItem("chatUser");
 
-    const response = await fetch(`http://localhost:5000/message/${username}`);
+    const response = await fetch(
+      `http://localhost:5000/message/${username}?user=${user}`
+    );
     const data = await response.json();
     setMessages(data);
   };
@@ -100,23 +93,20 @@ const ChatContextProvider = (props) => {
           receiver: selectedUser.username,
           message: message,
         };
-        console.log(chatMessage);
 
         await fetch("http://localhost:5000/send-message", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(chatMessage),
         });
-        console.log("ok");
 
         setMessage(""); // Clear the message input
+        socket.emit("message", chatMessage);
         fetchMessages(selectedUser.username); // Fetch updated messages
       } catch (error) {
         alert("Failed to send message");
       }
     }
-
-    socket.emit("message", user, message);
     setMessage("");
   };
 
@@ -147,6 +137,7 @@ const ChatContextProvider = (props) => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("chatUser", data.username);
+        setChatUser(data.username);
         toast.success("Registration successful");
         Cookies.set("jwt", data.token);
         navigate("/");
@@ -171,14 +162,19 @@ const ChatContextProvider = (props) => {
     } else {
       if (response.ok) {
         const data = await response.json();
-        console.log(data.username);
 
         localStorage.setItem("chatUser", data.username);
+        setChatUser(data.username);
         toast.success("Login successful");
         Cookies.set("jwt", data.token);
         navigate("/");
       }
     }
+  };
+
+  const logout = () => {
+    Cookies.remove("jwt");
+    navigate("/login");
   };
   const value = {
     handleLoginSubmit,
@@ -198,6 +194,7 @@ const ChatContextProvider = (props) => {
     selectedUser,
     usernames,
     getMessage,
+    logout,
   };
 
   return (

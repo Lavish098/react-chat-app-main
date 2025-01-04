@@ -33,8 +33,10 @@ app.use(chatRoute);
 io.on("connection", (socket) => {
   console.log(`User connected ${socket.id}`);
 
-  socket.on("join", (username) => {
-    socket.join(username);
+  socket.on("message", (message) => {
+    console.log(message);
+
+    io.emit("message", message);
   });
 
   socket.on("disconnect", () => {

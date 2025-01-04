@@ -13,23 +13,24 @@ const getUser = async (req, res) => {
 };
 
 const sendMessage = async (req, res) => {
-  console.log("ok");
-
   const { sender, receiver, message } = req.body;
-
-  console.log(req.body);
-
   const newMessage = new Chat({ sender, receiver, message });
   await newMessage.save();
   const io = req.app.locals.io;
-  io.to(receiver).emit("message", newMessage); // Emit to the specific receiver
+
+  // io.to(receiver).emit("message", newMessage); // Emit to the specific receiver
   res.status(201).json(newMessage);
 };
 
 const getMessage = async (req, res) => {
   const { username } = req.params;
+  const { user } = req.query;
+
   const messages = await Chat.find({
-    $or: [{ sender: username }, { receiver: username }],
+    $or: [
+      { sender: user, receiver: username },
+      { sender: username, receiver: user },
+    ],
   }).sort({ timestamp: "asc" });
   res.json(messages);
 };

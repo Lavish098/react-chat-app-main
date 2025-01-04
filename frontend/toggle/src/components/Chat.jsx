@@ -16,9 +16,9 @@ const Chat = () => {
     getMessage,
   } = useContext(ChatContext);
   return (
-    <div className="flex flex-row border border-gray-400 mt-10 h-[85vh]">
+    <div className="flex flex-row border border-gray-400 mt-10 max-h-full">
       {/* Left side */}
-      <div className="w-[25%] inline-block py-5 border border-gray-400">
+      <div className="w-[30%] inline-block py-5 border border-gray-400">
         <div className="bg-gray-700 text-white">
           <input
             type="text"
@@ -37,7 +37,7 @@ const Chat = () => {
                   <div
                     key={index}
                     onClick={() => getMessage(user)}
-                    className="border border-gray-400 py-4 px-2 text-black"
+                    className="border border-gray-400 py-4 px-2 text-black "
                   >
                     {user}
                   </div>
@@ -48,17 +48,26 @@ const Chat = () => {
       </div>
 
       {/* right side */}
-      <div className="w-[60%] inline-block py-5">
-        <div className="flex flex-col">
+      <div className="w-[70%] inline-block py-5 px-4">
+        <div className="flex flex-col w-full">
           {selectedUser && (
             <div>
-              <h2>Chatting with: {selectedUser.username}</h2>
-              <div className="ml-3">
+              <div className="flex text-lg font-medium mb-3">
+                <h2 className="p-2">Chatting with:</h2>
+                <h2 className="ml-2 bg-slate-600 text-base text-white p-2 rounded-2xl">
+                  {selectedUser.username}
+                </h2>
+              </div>
+              <div className="ml-3 overflow-auto max-h-[75vh] mb-3">
                 {messages.length > 0 ? (
                   messages.map((msg, index) => (
                     <div
                       key={index}
-                      className="bg-gray-500 text-white mt-2 px-2 py-3 rounded-md w-[40%]"
+                      className={`mt-2 px-2 py-3 rounded-md w-fit ${
+                        msg.sender === selectedUser.username
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-500 text-white ml-auto"
+                      }`}
                     >
                       <strong>{msg.sender}:</strong> {msg.message}
                     </div>
@@ -69,7 +78,7 @@ const Chat = () => {
               </div>
               <form
                 onSubmit={sendMessage}
-                className="border border-gray-500 py-4 px-3 w-[65.5%] fixed bottom-[26px]"
+                className="border border-gray-500 py-4 px-3 w-[65.5%]"
               >
                 <input
                   type="text"
