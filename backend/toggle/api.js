@@ -44,6 +44,10 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/", async (req, res) => {
+  res.status(200).json("Welcome to Manga API!");
+});
+
 const PORT = process.env.PORT || 5000;
 
 mongoose
