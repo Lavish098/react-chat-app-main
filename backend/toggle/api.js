@@ -21,13 +21,22 @@ app.locals.io = io;
 
 dotenv.config();
 
+const corsOptions = (req, callback) => {
+  const origin = req.header("Origin");
+  const allowedOrigins = [
+    "https://react-chat-app-main-nine.vercel.app/",
+    "http://localhost:5173/",
+  ];
+
+  if (allowedOrigins.includes(origin)) {
+    callback(null, { origin: true });
+  } else {
+    callback(null, { origin: false });
+  }
+};
+
 app.use(express.json());
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 app.use(authRoute);
 app.use(chatRoute);
 
@@ -46,7 +55,7 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", async (req, res) => {
-  res.status(200).json("Welcome to Manga API!");
+  res.status(200).json("Welcome to CHAT API!");
 });
 
 const PORT = process.env.PORT || 5000;
