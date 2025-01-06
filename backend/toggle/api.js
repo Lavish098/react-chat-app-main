@@ -15,6 +15,7 @@ const io = socketIo(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
+  maxHttpBufferSize: 1e8,
 });
 app.locals.io = io;
 
