@@ -24,8 +24,8 @@ dotenv.config();
 const corsOptions = (req, callback) => {
   const origin = req.header("Origin");
   const allowedOrigins = [
-    "https://react-chat-app-main-nine.vercel.app/",
-    "http://localhost:5173/",
+    "https://react-chat-app-main-nine.vercel.app",
+    "http://localhost:5173",
   ];
 
   if (allowedOrigins.includes(origin)) {
