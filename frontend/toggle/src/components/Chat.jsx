@@ -19,25 +19,30 @@ const Chat = () => {
     <div className="flex flex-row border border-gray-400 mt-10 max-h-full">
       {/* Left side */}
       <div className="w-[30%] inline-block py-5 border border-gray-400">
-        <div className="bg-gray-700 text-white">
+        <div className=" text-black w-full">
           <input
             type="text"
-            className="border border-gray-500 text-black py-2 mb-2"
+            className=" text-black text-xl px-2 py-5 outline-none mb-2 mx-3 w-[90%] border border-gray-500"
             value={searchUsername}
             onChange={(e) => setSearchUsername(e.target.value)}
           />
-          <button onClick={searchUser}>search</button>
+          <button
+            onClick={searchUser}
+            className="py-3 rounded-md bg-slate-500 w-[80%] my-3 mx-3 text-xl text-white font-medium"
+          >
+            search
+          </button>
           {/* <ul>{chatUser}</ul> */}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col cursor-pointer">
           <div>
             {usernames.length > 0
               ? usernames.map((user, index) => (
                   <div
                     key={index}
                     onClick={() => getMessage(user)}
-                    className="border border-gray-400 py-4 px-2 text-black "
+                    className="border border-gray-400 py-4 px-2 text-gray-700 mb-2 mx-2 text-xl "
                   >
                     {user}
                   </div>
@@ -49,12 +54,12 @@ const Chat = () => {
 
       {/* right side */}
       <div className="w-[70%] inline-block py-5 px-4">
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full ">
           {selectedUser && (
             <div>
               <div className="flex text-lg font-medium mb-3">
-                <h2 className="p-2">Chatting with:</h2>
-                <h2 className="ml-2 bg-slate-600 text-base text-white p-2 rounded-2xl">
+                <h2 className="p-2 text-gray-700">Chatting with:</h2>
+                <h2 className="ml-2 bg-slate-600 text-base text-white p-2 rounded-md">
                   {selectedUser.username}
                 </h2>
               </div>
