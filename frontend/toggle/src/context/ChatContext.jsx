@@ -4,7 +4,7 @@ import { data, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 
-const socket = io("https://react-chat-app-main-lbcd.vercel.app");
+const socket = io("https://react-chat-app-main.onrender.com");
 
 export const ChatContext = createContext();
 
@@ -43,7 +43,7 @@ const ChatContextProvider = (props) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://react-chat-app-main-lbcd.vercel.app/search?username=${searchUsername}`
+        `https://react-chat-app-main.onrender.com/search?username=${searchUsername}`
       );
       const data = await response.json();
       if (data) {
@@ -76,7 +76,7 @@ const ChatContextProvider = (props) => {
     const user = localStorage.getItem("chatUser");
 
     const response = await fetch(
-      `https://react-chat-app-main-lbcd.vercel.app/message/${username}?user=${user}`
+      `https://react-chat-app-main.onrender.com/message/${username}?user=${user}`
     );
     const data = await response.json();
     setMessages(data);
@@ -95,7 +95,7 @@ const ChatContextProvider = (props) => {
         };
 
         await fetch(
-          "https://react-chat-app-main-lbcd.vercel.app/send-message",
+          "https://react-chat-app-main.onrender.com/send-message",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -125,7 +125,7 @@ const ChatContextProvider = (props) => {
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch(
-      "https://react-chat-app-main-lbcd.vercel.app/signup",
+      "https://react-chat-app-main.onrender.com/signup",
       {
         method: "POST",
         headers: {
@@ -154,7 +154,7 @@ const ChatContextProvider = (props) => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch(
-      "https://react-chat-app-main-lbcd.vercel.app/signin",
+      "https://react-chat-app-main.onrender.com/signin",
       {
         method: "POST",
         headers: {
