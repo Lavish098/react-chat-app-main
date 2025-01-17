@@ -57,7 +57,10 @@ const ChatContextProvider = (props) => {
           localStorage.setItem("searchedUser", JSON.stringify(usernamesArray));
         }
       }
-      setUsernames(JSON.parse(searchedUser))
+      const searchedUser = localStorage.getItem("searchedUser");
+    if (searchedUser) {
+      setUsernames(JSON.parse(searchedUser));
+    }
       setSelectedUser(data[0]);
 
       setChatUser(data[0].username); // Set the chat user to the found user
