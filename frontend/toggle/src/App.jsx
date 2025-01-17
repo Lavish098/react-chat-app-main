@@ -11,16 +11,16 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
-    <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+    <div>
       <ToastContainer />
       <NavBar />
       {/* <SearchBar /> */}
 
       <Routes>
-        <Route path="/" element={<ProtectedRoute element={<Home />} />} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/chats" element={<Chats />} />
+        <Route path="/chats" element={<ProtectedRoute element={<Chats />} />} />
       </Routes>
       {/* <Footer /> */}
     </div>
