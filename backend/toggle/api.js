@@ -48,9 +48,6 @@ io.on("connection", (socket) => {
   // Add user to the users object
   users[socket.id] = { id: socket.id, status: "online" };
 
-  // Broadcast the updated user list to all clients
-  io.emit("userStatusUpdate", users);
-
   socket.on("message", (message) => {
     console.log(message);
     io.emit("message", message);
@@ -61,9 +58,12 @@ io.on("connection", (socket) => {
 
     // Remove user from the users object
     delete users[socket.id];
+  });
 
-    // Broadcast the updated user list to all clients
-    io.emit("userStatusUpdate", users);
+  // Check if a clicked user is online
+  socket.on("checkUser Status", (user) => {
+    const isOnline = Object.values(users).some((user) => user.id === user);
+    socket.emit("userStatusResponse", { userId: user, isOnline });
   });
 });
 
