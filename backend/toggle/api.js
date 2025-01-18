@@ -40,17 +40,30 @@ app.use(cors(corsOptions));
 app.use(authRoute);
 app.use(chatRoute);
 
+const users = {}; // Object to keep track of connected users
+
 io.on("connection", (socket) => {
-  console.log(`User connected ${socket.id}`);
+  console.log(`User  connected: ${socket.id}`);
+
+  // Add user to the users object
+  users[socket.id] = { id: socket.id, status: "online" };
+
+  // Broadcast the updated user list to all clients
+  io.emit("userStatusUpdate", users);
 
   socket.on("message", (message) => {
     console.log(message);
-
     io.emit("message", message);
   });
 
   socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    console.log("Client disconnected: " + socket.id);
+
+    // Remove user from the users object
+    delete users[socket.id];
+
+    // Broadcast the updated user list to all clients
+    io.emit("userStatusUpdate", users);
   });
 });
 
