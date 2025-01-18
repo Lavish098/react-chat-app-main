@@ -40,30 +40,40 @@ app.use(cors(corsOptions));
 app.use(authRoute);
 app.use(chatRoute);
 
-const users = {}; // Object to keep track of connected users
+const connectedUsers = {}; // Map username -> socket ID
 
 io.on("connection", (socket) => {
-  console.log(`User  connected: ${socket.id}`);
+  console.log(`User connected: ${socket.id}`);
 
-  // Add user to the users object
-  users[socket.id] = { id: socket.id, status: "online" };
-
-  socket.on("message", (message) => {
-    console.log(message);
-    io.emit("message", message);
+  // Track username when a user joins
+  socket.on("join", (username) => {
+    connectedUsers[username] = socket.id;
+    console.log(`${username} connected with socket ID: ${socket.id}`);
   });
 
+  // Handle user disconnection
   socket.on("disconnect", () => {
-    console.log("Client disconnected: " + socket.id);
-
-    // Remove user from the users object
-    delete users[socket.id];
+    for (const [username, socketId] of Object.entries(connectedUsers)) {
+      if (socketId === socket.id) {
+        delete connectedUsers[username];
+        console.log(`${username} disconnected`);
+        break;
+      }
+    }
+    console.log("Socket disconnected: ", socket.id);
   });
 
-  // Check if a clicked user is online
-  socket.on("checkUser Status", (user) => {
-    const isOnline = Object.values(users).some((user) => user.id === user);
-    socket.emit("userStatusResponse", { userId: user, isOnline });
+  // Listen for messages
+  socket.on("message", ({ sender, receiver, message }) => {
+    console.log(`Message from ${sender} to ${receiver}: ${message}`);
+
+    const receiverSocketId = connectedUsers[receiver];
+    if (receiverSocketId) {
+      // Emit message to the specific receiver
+      io.to(receiverSocketId).emit("message", { sender, message });
+    } else {
+      console.log(`Receiver ${receiver} is not online.`);
+    }
   });
 });
 
