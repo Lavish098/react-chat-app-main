@@ -40,9 +40,16 @@ app.use(cors(corsOptions));
 app.use(authRoute);
 app.use(chatRoute);
 
+const onlineUsers = {};
+
 io.on("connection", (socket) => {
   console.log(`User connected ${socket.id}`);
-  socket.emit("socketId", socket.id);
+
+  socket.on("registerUser", (userId) => {
+    onlineUsers[userId] = socket.id;
+
+    socket.broadcast.emit("userStatus", { userId, online: true });
+  });
 
   socket.on("message", (message) => {
     console.log(message);
@@ -52,6 +59,15 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
+
+    for (const userId in onlineUsers) {
+      if (onlineUsers[userId] === socket.id) {
+        delete onlineUsers[userId];
+
+        socket.broadcast.emit("userStatus", { userId, online: false });
+        break;
+      }
+    }
   });
 });
 
