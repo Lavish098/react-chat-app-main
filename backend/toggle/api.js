@@ -40,40 +40,18 @@ app.use(cors(corsOptions));
 app.use(authRoute);
 app.use(chatRoute);
 
-const connectedUsers = {}; // Map username -> socket ID
-
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  console.log(`User connected ${socket.id}`);
+  socket.emit("socketId", socket.id);
 
-  // Track username when a user joins
-  socket.on("join", (username) => {
-    connectedUsers[username] = socket.id;
-    console.log(`${username} connected with socket ID: ${socket.id}`);
+  socket.on("message", (message) => {
+    console.log(message);
+
+    io.emit("message", message);
   });
 
-  // Handle user disconnection
   socket.on("disconnect", () => {
-    for (const [username, socketId] of Object.entries(connectedUsers)) {
-      if (socketId === socket.id) {
-        delete connectedUsers[username];
-        console.log(`${username} disconnected`);
-        break;
-      }
-    }
-    console.log("Socket disconnected: ", socket.id);
-  });
-
-  // Listen for messages
-  socket.on("message", ({ sender, receiver, message }) => {
-    console.log(`Message from ${sender} to ${receiver}: ${message}`);
-
-    const receiverSocketId = connectedUsers[receiver];
-    if (receiverSocketId) {
-      // Emit message to the specific receiver
-      io.to(receiverSocketId).emit("message", { sender, message });
-    } else {
-      console.log(`Receiver ${receiver} is not online.`);
-    }
+    console.log("Client disconnected");
   });
 });
 
