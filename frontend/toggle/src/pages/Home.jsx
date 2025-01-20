@@ -3,12 +3,12 @@ import { assets } from "../assets/assets";
 
 const Home = () => {
   return (
-    <section className="flex justify-center items-center bg-slate-200 dark:bg-gray-900 min-h-[46.9rem]">
+    <section className="flex justify-center items-center bg-slate-200 dark:bg-gray-900 min-h-[88vh]">
       <div className="grid max-w-screen-xl px-4 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols12">
-        <div className="flex flex-col sm:flex-row  mr-auto place-self-center px-3">
-          <div className="flex  items-center lg:mt-0 lg:col-span-5 lg:hidden">
+        <div className="flex flex-col items-center gap-4 sm:flex-row  mr-auto place-self-center px-3">
+          <div className="flex items-center lg:mt-0 lg:col-span-5">
             <img
-              className="object-contain w-52 h-36 rounded-lg lg:rounded-none lg:rounded-r-lg invert-0 dark:invert"
+              className="object-contain w-52 h-36 md:w-72 md:h-72 rounded-lg lg:rounded-none lg:rounded-r-lg invert-0 dark:invert"
               src={assets.main_chat}
               alt="chat"
             />
@@ -21,13 +21,6 @@ const Home = () => {
               This is a realtime chat app built with react
             </p>
           </div>
-        </div>
-        <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
-          <img
-            className="object-contain w-full h-72 rounded-lg lg:rounded-none lg:rounded-r-lg"
-            src={assets.main_chat}
-            alt="chat"
-          />
         </div>
       </div>
     </section>

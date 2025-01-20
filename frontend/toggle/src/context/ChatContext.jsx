@@ -4,7 +4,9 @@ import { data, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 
-const socket = io("https://react-chat-app-main.onrender.com");
+const socket = io("http://localhost:5000");
+
+// https://react-chat-app-main.onrender.com
 
 export const ChatContext = createContext();
 
@@ -20,10 +22,13 @@ const ChatContextProvider = (props) => {
   const [usernames, setUsernames] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchUsername, setSearchUsername] = useState("");
-  const [chatUser, setChatUser] = useState(null);
+  const [chatUser, setChatUser] = useState([]);
+  const [search, setSeacrh] = useState(false);
+  const [online, setOnline] = useState([]);
 
   useEffect(() => {
-    socket.on("message", (newMessage) => {
+    socket.on("message", (newMessage = { sender, receiver, message }) => {
+      // const newMessage = { sender, receiver, message };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
     return () => {
@@ -32,11 +37,43 @@ const ChatContextProvider = (props) => {
   }, []);
 
   useEffect(() => {
+    // Listen for user status updates
+    socket.on("userStatus", (data) => {
+      console.log(data);
+
+      const { userId, online } = data;
+      console.log(userId, online);
+      setOnline(userId, online);
+
+      console.log(online);
+    });
+
+    // Clean up the socket connection on component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    socket.emit("registerUser", userId);
+  });
+
+  useEffect(() => {
     const searchedUser = localStorage.getItem("searchedUser");
     if (searchedUser) {
       setUsernames(JSON.parse(searchedUser));
     }
   }, []);
+
+  //search bar
+  const searchBar = () => {
+    if (search) {
+      setSeacrh(false);
+    } else {
+      setSeacrh(true);
+    }
+  };
 
   // search user
   const searchUser = async (e) => {
@@ -46,28 +83,38 @@ const ChatContextProvider = (props) => {
         `https://react-chat-app-main.onrender.com/search?username=${searchUsername}`
       );
       const data = await response.json();
-      if (data) {
-        const savedUser = localStorage.getItem("searchedUser");
+      console.log(data[0]);
 
-        const usernamesArray = savedUser ? JSON.parse(savedUser) : [];
-
-        const newUsername = data[0].username;
-        if (!usernamesArray.includes(newUsername)) {
-          usernamesArray.push(newUsername);
-          localStorage.setItem("searchedUser", JSON.stringify(usernamesArray));
-        }
-      }
-      const searchedUser = localStorage.getItem("searchedUser");
-    if (searchedUser) {
-      setUsernames(JSON.parse(searchedUser));
-    }
       setSelectedUser(data[0]);
-
-      setChatUser(data[0].username); // Set the chat user to the found user
+      setChatUser(data[0].username);
       setSearchUsername(""); // Clear the search input
       fetchMessages(data[0].username); // Fetch messages for the found user
     } catch (error) {
       toast.error("User does not exist");
+    }
+  };
+
+  const selectUser = () => {
+    console.log("selected");
+
+    if (chatUser > 0) {
+      console.log(chatUser);
+    }
+
+    if (chatUser) {
+      const savedUser = localStorage.getItem("searchedUser");
+
+      const usernamesArray = savedUser ? JSON.parse(savedUser) : [];
+
+      const newUsername = chatUser;
+      if (!usernamesArray.includes(newUsername)) {
+        usernamesArray.push(newUsername);
+        localStorage.setItem("searchedUser", JSON.stringify(usernamesArray));
+      }
+    }
+    const searchedUser = localStorage.getItem("searchedUser");
+    if (searchedUser) {
+      setUsernames(JSON.parse(searchedUser));
     }
   };
 
@@ -98,19 +145,18 @@ const ChatContextProvider = (props) => {
           message: message,
         };
 
-        await fetch(
-          "https://react-chat-app-main.onrender.com/send-message",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(chatMessage),
-          }
-        );
+        await fetch("https://react-chat-app-main.onrender.com/send-message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(chatMessage),
+        });
 
         setMessage(""); // Clear the message input
         socket.emit("message", chatMessage);
         fetchMessages(selectedUser.username); // Fetch updated messages
       } catch (error) {
+        console.log(error);
+
         alert("Failed to send message");
       }
     }
@@ -125,6 +171,8 @@ const ChatContextProvider = (props) => {
       navigate("/");
     }
   };
+
+  //Authentication
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
@@ -147,6 +195,7 @@ const ChatContextProvider = (props) => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("chatUser", data.username);
+        localStorage.setItem("userId", data.userId);
         setChatUser(data.username);
         toast.success("Registration successful");
         Cookies.set("jwt", data.token);
@@ -177,6 +226,7 @@ const ChatContextProvider = (props) => {
         const data = await response.json();
 
         localStorage.setItem("chatUser", data.username);
+        localStorage.setItem("userId", data.userId);
         setChatUser(data.username);
         toast.success("Login successful");
         Cookies.set("jwt", data.token);
@@ -187,8 +237,12 @@ const ChatContextProvider = (props) => {
 
   const logout = () => {
     Cookies.remove("jwt");
+    localStorage.removeItem("chatUser");
+    localStorage.removeItem("userId");
     navigate("/login");
   };
+
+  //Values
   const value = {
     handleLoginSubmit,
     formData,
@@ -208,6 +262,10 @@ const ChatContextProvider = (props) => {
     usernames,
     getMessage,
     logout,
+    searchBar,
+    search,
+    selectUser,
+    online,
   };
 
   return (
