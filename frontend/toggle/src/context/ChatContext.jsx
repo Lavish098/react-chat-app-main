@@ -4,9 +4,7 @@ import { data, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
-
-// https://react-chat-app-main.onrender.com
+const socket = io("https://react-chat-app-main.onrender.com");
 
 export const ChatContext = createContext();
 
