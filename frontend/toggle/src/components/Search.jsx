@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { ChatContext } from "../context/ChatContext";
+import Spinner from "./Spinner";
 
 const Search = () => {
   const {
@@ -9,6 +10,7 @@ const Search = () => {
     searchUsername,
     chatUser,
     selectUser,
+    spinner,
   } = useContext(ChatContext);
   return (
     <div className="absolute top-24 left-0 bg-slate-300 z-50 w-full h-screen">
@@ -31,9 +33,9 @@ const Search = () => {
           />
           <button
             onClick={searchUser}
-            className="py-3 rounded-md bg-slate-500 w-[50%] my-3 mx-3 text-xl text-white font-medium"
+            className="py-3 flex justify-center items-center rounded-md bg-slate-500 w-[50%] my-3 mx-3 text-xl text-white font-medium"
           >
-            search
+            {spinner ? <Spinner /> : "Search"}
           </button>
 
           <div>

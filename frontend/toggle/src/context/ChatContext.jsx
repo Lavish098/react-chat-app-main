@@ -23,6 +23,7 @@ const ChatContextProvider = (props) => {
   const [chatUser, setChatUser] = useState([]);
   const [search, setSeacrh] = useState(false);
   const [online, setOnline] = useState([]);
+  const [spinner, setSpinner] = useState(false);
 
   useEffect(() => {
     socket.on("message", (newMessage = { sender, receiver, message }) => {
@@ -75,6 +76,7 @@ const ChatContextProvider = (props) => {
 
   // search user
   const searchUser = async (e) => {
+    setSpinner(true);
     e.preventDefault();
     try {
       const response = await fetch(
@@ -82,12 +84,15 @@ const ChatContextProvider = (props) => {
       );
       const data = await response.json();
       console.log(data[0]);
+      setSpinner(false);
 
       setSelectedUser(data[0]);
       setChatUser(data[0].username);
       setSearchUsername(""); // Clear the search input
       fetchMessages(data[0].username); // Fetch messages for the found user
     } catch (error) {
+      setSpinner(false);
+
       toast.error("User does not exist");
     }
   };
@@ -174,6 +179,7 @@ const ChatContextProvider = (props) => {
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
+    setSpinner(true);
     const response = await fetch(
       "https://react-chat-app-main.onrender.com/signup",
       {
@@ -186,6 +192,7 @@ const ChatContextProvider = (props) => {
     );
 
     if (response.status === 400) {
+      setSpinner(false);
       const data = await response.json();
       const errorMessages = Object.values(data).filter(Boolean).join(", ");
       toast.error(errorMessages);
@@ -203,6 +210,7 @@ const ChatContextProvider = (props) => {
   };
 
   const handleLoginSubmit = async (e) => {
+    setSpinner(true);
     e.preventDefault();
     const response = await fetch(
       "https://react-chat-app-main.onrender.com/signin",
@@ -216,6 +224,7 @@ const ChatContextProvider = (props) => {
     );
 
     if (response.status === 400) {
+      setSpinner(false);
       const data = await response.json();
       const errorMessages = Object.values(data).filter(Boolean).join(", ");
       toast.error(errorMessages);
@@ -264,6 +273,7 @@ const ChatContextProvider = (props) => {
     search,
     selectUser,
     online,
+    spinner,
   };
 
   return (
