@@ -39,7 +39,7 @@ const Search = () => {
           </button>
 
           <div>
-            {chatUser.length > 0 ? (
+            {chatUser.username ? (
               <button
                 className="py-3 px-2 mt-9 rounded-md bg-slate-500 w-full text-md text-white font-medium"
                 onClick={() => {
@@ -47,7 +47,7 @@ const Search = () => {
                   searchBar();
                 }}
               >
-                {chatUser}
+                {chatUser.username}
               </button>
             ) : (
               ""

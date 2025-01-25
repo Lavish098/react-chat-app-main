@@ -51,10 +51,14 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("userStatus", { userId, online: true });
   });
 
-  socket.on("message", (message) => {
-    console.log(message);
+  socket.on("message", ({ sender, receiver, message }) => {
+    console.log({ sender, receiver, message });
+    const receiverId = onlineUsers[receiver];
+    if (receiverId) {
+      io.to(receiverId).emit("message", { sender, receiver, message });
+    }
 
-    io.emit("message", message);
+    // io.emit("message", message);
   });
 
   socket.on("disconnect", () => {

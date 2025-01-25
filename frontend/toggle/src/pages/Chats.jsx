@@ -3,7 +3,7 @@ import Chat from "../components/Chat";
 
 const Chats = () => {
   return (
-    <div>
+    <div className="w-full h-screen">
       <Chat />
     </div>
   );

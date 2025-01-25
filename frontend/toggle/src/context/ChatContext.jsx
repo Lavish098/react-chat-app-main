@@ -6,6 +6,8 @@ import { io } from "socket.io-client";
 
 const socket = io("https://react-chat-app-main.onrender.com");
 
+// https://react-chat-app-main.onrender.com
+
 export const ChatContext = createContext();
 
 const ChatContextProvider = (props) => {
@@ -24,12 +26,23 @@ const ChatContextProvider = (props) => {
   const [search, setSeacrh] = useState(false);
   const [online, setOnline] = useState([]);
   const [spinner, setSpinner] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState({});
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     socket.on("message", (newMessage = { sender, receiver, message }) => {
+      console.log(newMessage);
+
       // const newMessage = { sender, receiver, message };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+      // Update unread messages count
+      setUnreadMessages((prev) => ({
+        ...prev,
+        [newMessage.sender]: (prev[newMessage.sender] || 0) + 1,
+      }));
     });
+
     return () => {
       socket.off("receiveMessage");
     };
@@ -54,7 +67,7 @@ const ChatContextProvider = (props) => {
   }, [socket]);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    const userId = localStorage.getItem("chatUser");
     socket.emit("registerUser", userId);
   });
 
@@ -64,6 +77,10 @@ const ChatContextProvider = (props) => {
       setUsernames(JSON.parse(searchedUser));
     }
   }, []);
+
+  const toggleVisibility = () => {
+    setIsVisible((prev) => !prev);
+  };
 
   //search bar
   const searchBar = () => {
@@ -87,7 +104,7 @@ const ChatContextProvider = (props) => {
       setSpinner(false);
 
       setSelectedUser(data[0]);
-      setChatUser(data[0].username);
+      setChatUser(data[0]);
       setSearchUsername(""); // Clear the search input
       fetchMessages(data[0].username); // Fetch messages for the found user
     } catch (error) {
@@ -105,13 +122,16 @@ const ChatContextProvider = (props) => {
     }
 
     if (chatUser) {
+      console.log(chatUser);
+
       const savedUser = localStorage.getItem("searchedUser");
 
       const usernamesArray = savedUser ? JSON.parse(savedUser) : [];
 
       const newUsername = chatUser;
+
       if (!usernamesArray.includes(newUsername)) {
-        usernamesArray.push(newUsername);
+        usernamesArray.push(newUsername.username);
         localStorage.setItem("searchedUser", JSON.stringify(usernamesArray));
       }
     }
@@ -124,6 +144,7 @@ const ChatContextProvider = (props) => {
   const getMessage = (username) => {
     setSelectedUser({ username: username });
     fetchMessages(username);
+    localStorage.removeItem("unreadMessages");
   };
 
   const fetchMessages = async (username) => {
@@ -201,7 +222,7 @@ const ChatContextProvider = (props) => {
         const data = await response.json();
         localStorage.setItem("chatUser", data.username);
         localStorage.setItem("userId", data.userId);
-        setChatUser(data.username);
+        setChatUser(data);
         toast.success("Registration successful");
         Cookies.set("jwt", data.token);
         navigate("/");
@@ -234,7 +255,7 @@ const ChatContextProvider = (props) => {
 
         localStorage.setItem("chatUser", data.username);
         localStorage.setItem("userId", data.userId);
-        setChatUser(data.username);
+        setChatUser(data);
         toast.success("Login successful");
         Cookies.set("jwt", data.token);
         navigate("/");
@@ -244,6 +265,7 @@ const ChatContextProvider = (props) => {
 
   const logout = () => {
     Cookies.remove("jwt");
+    setChatUser([]);
     localStorage.removeItem("chatUser");
     localStorage.removeItem("userId");
     navigate("/login");
@@ -274,6 +296,10 @@ const ChatContextProvider = (props) => {
     selectUser,
     online,
     spinner,
+    unreadMessages,
+    setUnreadMessages,
+    isVisible,
+    toggleVisibility,
   };
 
   return (

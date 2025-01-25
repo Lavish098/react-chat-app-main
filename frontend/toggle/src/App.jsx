@@ -11,7 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
-    <div>
+    <div className="flex flex-row h-full">
       <ToastContainer />
       <NavBar />
       {/* <SearchBar /> */}
