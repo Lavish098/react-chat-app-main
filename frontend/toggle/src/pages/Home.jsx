@@ -3,7 +3,7 @@ import { assets } from "../assets/assets";
 
 const Home = () => {
   return (
-    <section className="flex justify-center items-center bg-slate-200 dark:bg-gray-900 min-h-[88vh]">
+    <section className="flex justify-center w-full items-center bg-slate-200 dark:bg-gray-900 min-h-[88vh]">
       <div className="grid max-w-screen-xl px-4 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols12">
         <div className="flex flex-col items-center gap-4 sm:flex-row  mr-auto place-self-center px-3">
           <div className="flex items-center lg:mt-0 lg:col-span-5">

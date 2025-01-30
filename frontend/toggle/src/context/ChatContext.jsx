@@ -28,6 +28,7 @@ const ChatContextProvider = (props) => {
   const [spinner, setSpinner] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState({});
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     socket.on("message", (newMessage = { sender, receiver, message }) => {
@@ -71,6 +72,23 @@ const ChatContextProvider = (props) => {
     socket.emit("registerUser", userId);
   });
 
+  const checkIfMobile = () => {
+    setIsMobile(window.innerWidth < 768); // Adjust the breakpoint as needed
+  };
+
+  useEffect(() => {
+    // Check if the view is mobile on initial render
+    checkIfMobile();
+
+    // Add event listener to handle window resize
+    window.addEventListener("resize", checkIfMobile);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", checkIfMobile);
+    };
+  }, []);
+
   useEffect(() => {
     const searchedUser = localStorage.getItem("searchedUser");
     if (searchedUser) {
@@ -79,7 +97,9 @@ const ChatContextProvider = (props) => {
   }, []);
 
   const toggleVisibility = () => {
-    setIsVisible((prev) => !prev);
+    if (isMobile) {
+      setIsVisible((prev) => !prev);
+    }
   };
 
   //search bar

@@ -28,12 +28,15 @@ const ChatRight = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col w-full md:h-[10%]">
+      <div className="w-full max-h-screen">
         {selectedUser && (
           <div>
             <div className="flex text-lg fixed top-0 w-full font-medium mb-3">
               <div className="flex items-center w-full h-15 p-1 bg-gray-600  dark:bg-gray-800 shadow-md">
-                <div onClick={toggleVisibility} className=" text-slate-500">
+                <div
+                  onClick={toggleVisibility}
+                  className=" text-slate-500 md:hidden"
+                >
                   <svg
                     width="44px"
                     height="44px"
@@ -89,23 +92,25 @@ const ChatRight = () => {
                 </div>
               </div>
             </div>
-            <div className="ml-3 overflow-y-auto mb-28 flex flex-col">
-              {messages.length > 0 ? (
-                messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`px-2 py-3 w-fit dark:bg-gray-800 my-2 rounded-2xl ${
-                      msg.sender === selectedUser.username
-                        ? "bg-gray-400 text-white rounded-bl-none"
-                        : "bg-gray-500 text-white ml-auto mr-3 rounded-br-none"
-                    }`}
-                  >
-                    {msg.message}
-                  </div>
-                ))
-              ) : (
-                <div>No messages yet.</div> // Display when there are no messages
-              )}
+            <div className="ml-3 overflow-y-auto p-4 flex-1 h-screen pb-28">
+              <div className="flex flex-col space-y-2">
+                {messages.length > 0 ? (
+                  messages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`px-2 py-3 w-fit dark:bg-gray-800 my-2 rounded-2xl ${
+                        msg.sender === selectedUser.username
+                          ? "bg-gray-400 text-white rounded-bl-none"
+                          : "bg-gray-500 text-white ml-auto mr-3 rounded-br-none"
+                      }`}
+                    >
+                      {msg.message}
+                    </div>
+                  ))
+                ) : (
+                  <div>No messages yet.</div> // Display when there are no messages
+                )}
+              </div>
             </div>
 
             <div ref={messageEndRef} />
